@@ -1,8 +1,8 @@
 USE demodb;
 
-DROP TABLE IF EXISTS invoice;
+DROP TABLE IF EXISTS invoices;
 
-CREATE TABLE invoice
+CREATE TABLE invoices
 (
     id              INT AUTO_INCREMENT PRIMARY KEY,
     uuid            VARCHAR(250) NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE invoice
     payment_form    VARCHAR(250) NOT NULL
 );
 
-INSERT INTO invoice (id, uuid, created_at, updated_at, amount, supplier_name, supplier_id, customer_name, customer_id,
+INSERT INTO invoices (id, uuid, created_at, updated_at, amount, supplier_name, supplier_id, customer_name, customer_id,
                      issuing_date, due_date, fulfilment_date, payment_form)
 VALUES (1, uuid(), '2023-10-11', null, 666, 'satoshi_labs', '1', 'Alice', 1000, '2023-10-11', '2023-11-11', '2033-11-11', 'cash'),
        (2, uuid(), '2023-10-11', null, 666.6, 'general_bytes', '2', 'Bob', 1000, '2023-10-11', '2023-11-11', '2023-11-11', 'bank_transfer'),

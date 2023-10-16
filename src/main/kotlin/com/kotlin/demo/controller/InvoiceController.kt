@@ -14,14 +14,14 @@ import java.util.*
 
 @RestController
 @RequestMapping("/demo/api")
-open class InvoiceController(
+class InvoiceController(
     private val invoiceRepository: InvoiceRepository,
     private val invoiceService: InvoiceService
 ){
 
     @Transactional
     @PutMapping("/invoice")
-    open fun createInvoice(@RequestBody invoice: String): Any {
+    fun createInvoice(@RequestBody invoice: String): Any {
         val mapper = ObjectMapper().registerModules(KotlinModule.Builder().build(),
             JavaTimeModule())
         val invoiceData = mapper.readValue(invoice, Invoice::class.java)
@@ -38,7 +38,7 @@ open class InvoiceController(
 
     @Transactional
     @PatchMapping("/invoice/{uuid}")
-    open fun updateInvoice(@PathVariable uuid: String, @RequestBody invoice: String): Any {
+    fun updateInvoice(@PathVariable uuid: String, @RequestBody invoice: String): Any {
         val selectedInvoice: Optional<Invoice> = invoiceRepository.findByUuid(uuid)
         if (selectedInvoice.isEmpty()) {
             return ResponseEntity.notFound()
@@ -51,7 +51,7 @@ open class InvoiceController(
 
     @Transactional
     @DeleteMapping("/invoice/{uuid}")
-    open fun deleteByUuid(@PathVariable uuid: String): ResponseEntity<Optional<Invoice>> {
+    fun deleteByUuid(@PathVariable uuid: String): ResponseEntity<Optional<Invoice>> {
         return ResponseEntity.ok().body(invoiceRepository.deleteByUuid(uuid))
     }
 }

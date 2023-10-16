@@ -8,6 +8,6 @@ import org.springframework.stereotype.Service
 class InvoiceService () {
 
     fun paymentFormIsValid(paymentString: String): Boolean {
-        return Payment.values().any { payment -> paymentString.contains(payment.type) }
+        return Payment.entries.any { payment -> paymentString.contains(payment.type) }
     }
 }
