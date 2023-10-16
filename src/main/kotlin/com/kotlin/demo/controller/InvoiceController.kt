@@ -32,7 +32,11 @@ class InvoiceController(
     }
 
     @GetMapping("/invoice/{uuid}")
-    fun getByUuid(@PathVariable uuid: String): ResponseEntity<Optional<Invoice>> {
+    fun getByUuid(@PathVariable uuid: String): Any {
+        val selectedInvoice: Optional<Invoice> = invoiceRepository.findByUuid(uuid)
+        if (selectedInvoice.isEmpty) {
+            return ResponseEntity.status(404).body("Invoice with uuid: $uuid not found")
+        }
         return ResponseEntity.ok().body(invoiceRepository.findByUuid(uuid))
     }
 
@@ -40,12 +44,12 @@ class InvoiceController(
     @PatchMapping("/invoice/{uuid}")
     fun updateInvoice(@PathVariable uuid: String, @RequestBody invoice: String): Any {
         val selectedInvoice: Optional<Invoice> = invoiceRepository.findByUuid(uuid)
-        if (selectedInvoice.isEmpty()) {
-            return ResponseEntity.notFound()
+        if (selectedInvoice.isEmpty) {
+            return ResponseEntity.status(404).body("Invoice with uuid: $uuid not found")
         }
         val mapper = ObjectMapper().registerModules(KotlinModule.Builder().build(), JavaTimeModule())
         val invoiceData = mapper.readValue(invoice, Invoice::class.java)
-        invoiceData.id = selectedInvoice.get().id
+        invoiceData.uuid = selectedInvoice.get().uuid
         return ResponseEntity.ok(invoiceRepository.save(invoiceData))
     }
 
