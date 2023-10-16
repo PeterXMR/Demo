@@ -22,9 +22,7 @@ class InvoiceController(
     @Transactional
     @PutMapping("/invoice")
     fun createInvoice(@RequestBody invoice: String): Any {
-        val mapper = ObjectMapper().registerModules(KotlinModule.Builder().build(),
-            JavaTimeModule())
-        val invoiceData = mapper.readValue(invoice, Invoice::class.java)
+        val invoiceData = getRequestData(invoice) ?: return ResponseEntity.badRequest()
         if (invoiceService.paymentFormIsValid(invoiceData.payment_form)) {
             return ResponseEntity.ok(invoiceRepository.save(invoiceData))
         }
@@ -35,7 +33,7 @@ class InvoiceController(
     fun getByUuid(@PathVariable uuid: String): Any {
         val selectedInvoice: Optional<Invoice> = invoiceRepository.findByUuid(uuid)
         if (selectedInvoice.isEmpty) {
-            return ResponseEntity.status(404).body("Invoice with uuid: $uuid not found")
+            return ResponseEntity.status(404).body(getUuidNotFoundMessage(uuid))
         }
         return ResponseEntity.ok().body(invoiceRepository.findByUuid(uuid))
     }
@@ -43,12 +41,11 @@ class InvoiceController(
     @Transactional
     @PatchMapping("/invoice/{uuid}")
     fun updateInvoice(@PathVariable uuid: String, @RequestBody invoice: String): Any {
+        val invoiceData = getRequestData(invoice) ?: return ResponseEntity.badRequest()
         val selectedInvoice: Optional<Invoice> = invoiceRepository.findByUuid(uuid)
         if (selectedInvoice.isEmpty) {
-            return ResponseEntity.status(404).body("Invoice with uuid: $uuid not found")
+            return ResponseEntity.status(404).body(getUuidNotFoundMessage(uuid))
         }
-        val mapper = ObjectMapper().registerModules(KotlinModule.Builder().build(), JavaTimeModule())
-        val invoiceData = mapper.readValue(invoice, Invoice::class.java)
         invoiceData.uuid = selectedInvoice.get().uuid
         return ResponseEntity.ok(invoiceRepository.save(invoiceData))
     }
@@ -57,5 +54,14 @@ class InvoiceController(
     @DeleteMapping("/invoice/{uuid}")
     fun deleteByUuid(@PathVariable uuid: String): ResponseEntity<Optional<Invoice>> {
         return ResponseEntity.ok().body(invoiceRepository.deleteByUuid(uuid))
+    }
+
+    fun getRequestData(invoice: String): Invoice? {
+        val objectMapper = ObjectMapper().registerModules(KotlinModule.Builder().build(), JavaTimeModule())
+        return objectMapper.readValue(invoice, Invoice::class.java)
+    }
+
+    fun getUuidNotFoundMessage(uuid: String): String {
+        return "Invoice with uuid: $uuid not found"
     }
 }
