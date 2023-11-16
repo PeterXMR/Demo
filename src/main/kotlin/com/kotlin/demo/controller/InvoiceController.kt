@@ -20,7 +20,7 @@ class InvoiceController(
 ){
 
     @Transactional
-    @PutMapping("/invoice")
+    @PostMapping("/invoice")
     fun createInvoice(@RequestBody invoice: String): Any {
         val invoiceData = getRequestData(invoice) ?: return ResponseEntity.badRequest()
         if (invoiceService.paymentFormIsValid(invoiceData.payment_form)) {
